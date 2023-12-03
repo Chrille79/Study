@@ -1,5 +1,7 @@
 import { LitElement, html, svg, css, createRef, ref } from 'https://cdn.jsdelivr.net/gh/lit/dist@3/all/lit-all.min.js';
 import 'https://unpkg.com/commonmark@0.29.3/dist/commonmark.js'
+import { StudyMD } from './studyMD.js';
+
 export class StudyCard extends LitElement {
     static styles = css`
     :host{
@@ -17,24 +19,13 @@ export class StudyCard extends LitElement {
     article {
         background: #fff;
         border: solid 1px #ccc;
-        max-width: 100%;
-        /* max-height: 100%; */
-        width: 100%;
-        /* height: 30px; */
         padding: 5%;
-        margin-bottom: 5%;
         box-sizing: border-box;
-        container-type: size;
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
         transition: 0.3s;
         border-radius: 5px;
         flex: 1 1 auto;
-        aspect-ratio: 16/9;
-        font-size: 2cqw;
         white-space-collapse: preserve-breaks;
-    }
-    article header{
-        font-size: 4cqw;
     }
 
     article:hover {
@@ -65,7 +56,7 @@ export class StudyCard extends LitElement {
     renderArticle() {
         if (this.data) {
             var article = this.articles[this.index];
-            return html`<header>${article.Title}</header>${article.Body}`;
+            return html`<study-md markdown="${article}"></study-md>`;
         }
 
     }
@@ -83,21 +74,7 @@ export class StudyCard extends LitElement {
     }
 
     makeArticles() {
-
-        const allLines = this.data.split(/\r\n|\n/);
-        var obj = {};
-        allLines.forEach((line) => {
-            line = line.trimStart();
-            if (line.startsWith('#')) {
-                obj = {};
-                this.articles.push(obj);
-                obj.Title = line;
-                obj.Body = "";
-            }
-            else {
-                obj.Body += '\n' + line;
-            }
-        });
+        this.articles = this.data.split(/(?=#\s)/g);
     }
 
     async getData() {
