@@ -1,5 +1,5 @@
 import { LitElement, html, svg, css, createRef, ref } from 'https://cdn.jsdelivr.net/gh/lit/dist@3/all/lit-all.min.js';
-
+import 'https://unpkg.com/commonmark@0.29.3/dist/commonmark.js'
 export class StudyCard extends LitElement {
     static styles = css`
     :host{
@@ -75,6 +75,11 @@ export class StudyCard extends LitElement {
         var response = await this.getData();
         this.data = await response.text();
         this.makeArticles();
+        var reader = new commonmark.Parser();
+        var writer = new commonmark.HtmlRenderer();
+        var parsed = reader.parse(this.data); // parsed is a 'Node' tree
+        // transform parsed if you like...
+        var result = writer.render(parsed); // result is a String
     }
 
     makeArticles() {
