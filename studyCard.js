@@ -1,5 +1,4 @@
 import { LitElement, html, svg, css, createRef, ref } from 'https://cdn.jsdelivr.net/gh/lit/dist@3/all/lit-all.min.js';
-import 'https://unpkg.com/commonmark@0.29.3/dist/commonmark.js'
 import { StudyMD } from './studyMD.js';
 
 export class StudyCard extends LitElement {
@@ -26,12 +25,45 @@ export class StudyCard extends LitElement {
         border-radius: 5px;
         flex: 1 1 auto;
         white-space-collapse: preserve-breaks;
+        position:relative;
     }
 
     article:hover {
         box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
-        
-    }`;
+  
+    }
+    article .right, article .left{
+        visibility:hidden;
+    }
+    article:hover .right, article:hover .left{
+        visibility: visible;
+        border-radius: 3px 0 0 3px;
+        z-index: 1;
+        cursor: pointer;
+        position: absolute;
+        width: auto;
+        padding: 12px;
+        color: white;
+        background-color: rgba(0,0,0,0.8);
+        font-weight: bold;
+        font-size: 18px;
+        transition: background-color 0.9s ease;
+        top: 50%;
+        margin-top: -22px;
+    }
+    article .left{
+        left:0;
+
+    }
+
+    article .right{
+        right: 0;
+
+    }
+
+    `;
+
+
 
     static properties = {
         data: { type: String },
@@ -50,7 +82,25 @@ export class StudyCard extends LitElement {
     }
 
     render() {
-        return html`<article ${ref(this.articleRef)}>${this.renderArticle()}</article>`;
+        //return this.renderAllView();
+
+        return html`<article ${ref(this.articleRef)}>${this.renderArticle()}
+        <span class="left" @click="${() => this.swipeDetected(null, 'left')}">❮</span>
+        <span class="right" @click="${() => this.swipeDetected(null, 'right')}">❯</span>
+        </article>`;
+    }
+
+    renderAllView() {
+        if (this.data) {
+            return html`<study-md markdown="${this.data}"></study-md>`;
+        }
+    }
+
+    renderOneView() {
+        return html`<article ${ref(this.articleRef)}>${this.renderArticle()}
+            <span class="left" @click="${() => this.swipeDetected(null, 'left')}">❮</span>
+            <span class="right" @click="${() => this.swipeDetected(null, 'right')}">❯</span>
+        </article>`;
     }
 
     renderArticle() {
@@ -66,11 +116,6 @@ export class StudyCard extends LitElement {
         var response = await this.getData();
         this.data = await response.text();
         this.makeArticles();
-        var reader = new commonmark.Parser();
-        var writer = new commonmark.HtmlRenderer();
-        var parsed = reader.parse(this.data); // parsed is a 'Node' tree
-        // transform parsed if you like...
-        var result = writer.render(parsed); // result is a String
     }
 
     makeArticles() {
@@ -78,7 +123,7 @@ export class StudyCard extends LitElement {
     }
 
     async getData() {
-        const response = await fetch('./test.md');
+        const response = await fetch('./religion.md');
         return response;
     }
 
